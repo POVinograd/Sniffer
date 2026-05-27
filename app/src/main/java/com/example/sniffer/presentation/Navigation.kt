@@ -1,4 +1,4 @@
-package com.example.sniffer
+package com.example.sniffer.presentation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import com.example.sniffer.presentation.Screen
 
 @Composable
 fun Navigation() {

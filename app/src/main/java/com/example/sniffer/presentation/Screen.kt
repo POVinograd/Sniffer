@@ -1,4 +1,4 @@
-package com.example.sniffer
+package com.example.sniffer.presentation
 
 sealed class Screen (val route: String){
     object MainScreen : Screen(route = "main_screen")
@@ -13,4 +13,3 @@ sealed class Screen (val route: String){
         }
     }
 }
-
