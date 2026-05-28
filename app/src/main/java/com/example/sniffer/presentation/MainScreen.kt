@@ -95,7 +95,7 @@ fun MainScreen(name: String?, viewModel: MainViewModel = viewModel()) {
         if (timelineData.isNotEmpty()) {
             Bme680Graph(dataPoints = timelineData, selectedType = viewModel.selectedMetric)
         } else {
-            // Если данных пока нет, показываем красивую заглушку вместо падения
+            // Если данных пока нет, заглушка
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -136,34 +136,46 @@ fun Bme680Graph(dataPoints: List<SensorData>, selectedType: MetricType) {
             .height(200.dp)
             .background(Color.DarkGray.copy(alpha = 0.05f), shape = RoundedCornerShape(8.dp))
     ) {
-        if (dataPoints.size > 1) {
-            val path = Path()
-            val widthBetweenPoints = size.width / (dataPoints.size - 1)
-
-            val (minVal, maxVal) = when (selectedType) {
-                MetricType.TEMPERATURE -> Pair(15f, 40f)
-                MetricType.HUMIDITY -> Pair(0f, 100f)
-                MetricType.PRESSURE -> Pair(950f, 1050f)
-                MetricType.GAS -> Pair(0f, 150000f)
+        if (dataPoints.size == 1) {
+            val bmeData = dataPoints.first()
+            val floatValue = when (selectedType) {
+                MetricType.TEMPERATURE -> bmeData.temperature
+                MetricType.HUMIDITY -> bmeData.humidity
+                MetricType.PRESSURE -> bmeData.pressure
+                MetricType.GAS -> bmeData.gasResistance
             }
-            val valueRange = maxVal - minVal
-
-            dataPoints.forEachIndexed { index, bmeData ->
-                val floatValue = when (selectedType) {
-                    MetricType.TEMPERATURE -> bmeData.temperature
-                    MetricType.HUMIDITY -> bmeData.humidity
-                    MetricType.PRESSURE -> bmeData.pressure
-                    MetricType.GAS -> bmeData.gasResistance
-                }
-
-                val clampedValue = floatValue.coerceIn(minVal, maxVal)
-                val x = index * widthBetweenPoints
-                val y = size.height - ((clampedValue - minVal) / valueRange * size.height)
-
-                if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
-                drawCircle(color = Color(0xFF6200EE), radius = 4f, center = Offset(x, y))
-            }
-            drawPath(path = path, color = Color(0xFF3700B3), style = Stroke(width = 4f))
+            drawCircle(color = Color(0xFF6200EE), radius = 6f, center = Offset(size.width / 2, size.height / 2))
+            return@Canvas
         }
+
+        val path = Path()
+        val widthBetweenPoints = size.width / (dataPoints.size - 1)
+        val (minVal, maxVal) = when (selectedType) {
+            MetricType.TEMPERATURE -> Pair(15f, 40f)
+            MetricType.HUMIDITY -> Pair(0f, 100f)
+            MetricType.PRESSURE -> Pair(950f, 1050f)
+            MetricType.GAS -> Pair(0f, 150000f)
+        }
+        val valueRange = maxVal - minVal
+
+        dataPoints.forEachIndexed { index, bmeData ->
+            val floatValue = when (selectedType) {
+                MetricType.TEMPERATURE -> bmeData.temperature
+                MetricType.HUMIDITY -> bmeData.humidity
+                MetricType.PRESSURE -> bmeData.pressure
+                MetricType.GAS -> bmeData.gasResistance
+            }
+
+            val clampedValue = floatValue.coerceIn(minVal, maxVal)
+            val x = index * widthBetweenPoints
+
+            // Защита от деления на ноль, если диапазон выставлен неверно
+            val denominator = if (valueRange == 0f) 1f else valueRange
+            val y = size.height - ((clampedValue - minVal) / denominator * size.height)
+
+            if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
+            drawCircle(color = Color(0xFF6200EE), radius = 4f, center = Offset(x, y))
+        }
+        drawPath(path = path, color = Color(0xFF3700B3), style = Stroke(width = 4f))
     }
 }

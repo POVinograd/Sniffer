@@ -3,6 +3,7 @@ package com.example.sniffer.presentation
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +49,11 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize().padding(32.dp)
     ) {
+        Text(
+            text = "Sniffer Auth",
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 24.dp)
+        )
         TextField(
             value = viewModel.email,
             onValueChange = { viewModel.email = it },
@@ -65,11 +73,18 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         if (viewModel.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         } else {
-            Button(
-                onClick = { viewModel.onLoginClick() },
-                modifier = Modifier.align(Alignment.End)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "Authorize")
+                TextButton(onClick = { viewModel.onRegisterClick() }) {
+                    Text(text = "Регистрация")
+                }
+                Button(
+                    onClick = { viewModel.onLoginClick() }
+                ) {
+                    Text(text = "Authorize")
+                }
             }
         }
     }

@@ -28,4 +28,36 @@ class LoginViewModel : ViewModel() {
             isLoading = false
         }
     }
+
+    fun onRegisterClick(){ //метод для регистрации
+        viewModelScope.launch{
+            if (email.isEmpty() || password.isEmpty()) {
+                _loginResult.emit(Result.failure(Exception("Поля не должны быть пустыми")))
+                return@launch
+            }
+            if (password.length < 6) {
+                _loginResult.emit(Result.failure(Exception("Пароль должен быть от 6 символов")))
+                return@launch
+            }
+            isLoading = true
+
+            com.google.firebase.auth.FirebaseAuth.getInstance()
+                .createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener{
+                    task->viewModelScope.launch {
+                        isLoading = false
+                        if (task.isSuccessful){
+                            _loginResult.emit(Result.success(Unit))
+                        }
+                        else{
+                            val excep = task.exception ?: Exception("Ошибка регистрации")
+                            _loginResult.emit(Result.failure(excep))
+                        }
+                }
+                }
+
+
+        }
+
+    }
 }
