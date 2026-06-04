@@ -5,5 +5,5 @@ data class SensorData(
     val temperature: Float,
     val humidity: Float,
     val pressure: Float,
-    val gasResistance: Float
+    val iaq: Float
 )

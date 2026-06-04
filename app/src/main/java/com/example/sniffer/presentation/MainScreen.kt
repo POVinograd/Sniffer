@@ -79,7 +79,7 @@ fun MainScreen(name: String?, viewModel: MainViewModel = viewModel()) {
             item {
                 SensorCard(
                     title = "Gas Resistance",
-                    value = "${String.format("%.0f", currentReading.gasResistance / 1000f)} kΩ",
+                    value = "${String.format("%.0f", currentReading.iaq)} IAQ",
                     isSelected = viewModel.selectedMetric == MetricType.GAS
                 ) {
                     viewModel.selectedMetric = MetricType.GAS
@@ -142,7 +142,7 @@ fun Bme680Graph(dataPoints: List<SensorData>, selectedType: MetricType) {
                 MetricType.TEMPERATURE -> bmeData.temperature
                 MetricType.HUMIDITY -> bmeData.humidity
                 MetricType.PRESSURE -> bmeData.pressure
-                MetricType.GAS -> bmeData.gasResistance
+                MetricType.GAS -> bmeData.iaq
             }
             drawCircle(color = Color(0xFF6200EE), radius = 6f, center = Offset(size.width / 2, size.height / 2))
             return@Canvas
@@ -151,10 +151,10 @@ fun Bme680Graph(dataPoints: List<SensorData>, selectedType: MetricType) {
         val path = Path()
         val widthBetweenPoints = size.width / (dataPoints.size - 1)
         val (minVal, maxVal) = when (selectedType) {
-            MetricType.TEMPERATURE -> Pair(15f, 40f)
+            MetricType.TEMPERATURE -> Pair(0f, 40f)
             MetricType.HUMIDITY -> Pair(0f, 100f)
             MetricType.PRESSURE -> Pair(950f, 1050f)
-            MetricType.GAS -> Pair(0f, 150000f)
+            MetricType.GAS -> Pair(0f, 500f)
         }
         val valueRange = maxVal - minVal
 
@@ -163,7 +163,7 @@ fun Bme680Graph(dataPoints: List<SensorData>, selectedType: MetricType) {
                 MetricType.TEMPERATURE -> bmeData.temperature
                 MetricType.HUMIDITY -> bmeData.humidity
                 MetricType.PRESSURE -> bmeData.pressure
-                MetricType.GAS -> bmeData.gasResistance
+                MetricType.GAS -> bmeData.iaq
             }
 
             val clampedValue = floatValue.coerceIn(minVal, maxVal)
