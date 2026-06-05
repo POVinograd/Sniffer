@@ -18,7 +18,7 @@ class FirebaseSensorRepositoryImpl : SensorRepository {
     private val databaseRef = FirebaseDatabase.getInstance().getReference("bme680")
 
     override fun getSensorStream(): Flow<List<SensorData>> = callbackFlow {
-        // Локальный список в памяти телефона для накопления точек графика
+        // Локальный список в памяти телефона для накопления точек графика НАДО ЗАМЕНИТЬ, ДАННЫЕ НЕ СОХРАНЯЮТСЯ
         val historyList = mutableListOf<SensorData>()
 
         val listener = object : ValueEventListener {

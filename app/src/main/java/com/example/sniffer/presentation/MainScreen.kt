@@ -51,7 +51,7 @@ fun MainScreen(name: String?, viewModel: MainViewModel = viewModel()) {
         ) {
             item {
                 SensorCard(
-                    title = "Temperature",
+                    title = "Температура",
                     value = "${String.format("%.1f", currentReading.temperature)} °C",
                     isSelected = viewModel.selectedMetric == MetricType.TEMPERATURE
                 ) {
@@ -60,7 +60,7 @@ fun MainScreen(name: String?, viewModel: MainViewModel = viewModel()) {
             }
             item {
                 SensorCard(
-                    title = "Humidity",
+                    title = "Влажность",
                     value = "${String.format("%.1f", currentReading.humidity)} %",
                     isSelected = viewModel.selectedMetric == MetricType.HUMIDITY
                 ) {
@@ -69,7 +69,7 @@ fun MainScreen(name: String?, viewModel: MainViewModel = viewModel()) {
             }
             item {
                 SensorCard(
-                    title = "Pressure",
+                    title = "Давление",
                     value = "${String.format("%.0f", currentReading.pressure)} hPa",
                     isSelected = viewModel.selectedMetric == MetricType.PRESSURE
                 ) {
@@ -78,7 +78,7 @@ fun MainScreen(name: String?, viewModel: MainViewModel = viewModel()) {
             }
             item {
                 SensorCard(
-                    title = "Gas Resistance",
+                    title = "Качество воздуха",
                     value = "${String.format("%.0f", currentReading.iaq)} IAQ",
                     isSelected = viewModel.selectedMetric == MetricType.GAS
                 ) {
@@ -103,7 +103,7 @@ fun MainScreen(name: String?, viewModel: MainViewModel = viewModel()) {
                     .height(200.dp)
                     .background(Color.DarkGray.copy(alpha = 0.05f), shape = RoundedCornerShape(8.dp))
             ) {
-                Text(text = "Waiting for Firebase data...", color = Color.Gray)
+                Text(text = "Ожидание данных из Firebase...", color = Color.Gray)
             }
         }
     }
@@ -118,7 +118,7 @@ fun SensorCard(title: String, value: String, isSelected: Boolean, onClick: () ->
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() } // Теперь клик просто меняет вкладку без падения
+            .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = title, style = MaterialTheme.typography.labelLarge, color = Color.Gray)

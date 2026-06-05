@@ -40,7 +40,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
             if (result.isSuccess) {
                 navController.navigate(Screen.MainScreen.withArgs(viewModel.email))
             } else {
-                Toast.makeText(context, "Error: ${result.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Ошибка: ${result.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -50,21 +50,21 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         modifier = Modifier.fillMaxSize().padding(32.dp)
     ) {
         Text(
-            text = "Sniffer Auth",
+            text = "Sniffer",
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 24.dp)
         )
         TextField(
             value = viewModel.email,
             onValueChange = { viewModel.email = it },
-            label = { Text("Email") },
+            label = { Text("Почта") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(12.dp))
         TextField(
             value = viewModel.password,
             onValueChange = { viewModel.password = it },
-            label = { Text("Password") },
+            label = { Text("Пароль") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
@@ -83,7 +83,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
                 Button(
                     onClick = { viewModel.onLoginClick() }
                 ) {
-                    Text(text = "Authorize")
+                    Text(text = "Вход")
                 }
             }
         }
