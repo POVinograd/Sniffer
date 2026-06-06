@@ -17,9 +17,14 @@ class FirebaseSensorRepositoryImpl : SensorRepository {
     // Слушаем конкретно один узел "bme680"
     private val databaseRef = FirebaseDatabase.getInstance().getReference("bme680")
 
+    // Локальный список в памяти телефона для накопления точек графика
+    private val historyList = mutableListOf<SensorData>()
+
+    companion object {
+        private const val MAX_HISTORY = 20 //максимальное количество сохранённых данных
+    }
+
     override fun getSensorStream(): Flow<List<SensorData>> = callbackFlow {
-        // Локальный список в памяти телефона для накопления точек графика НАДО ЗАМЕНИТЬ, ДАННЫЕ НЕ СОХРАНЯЮТСЯ
-        val historyList = mutableListOf<SensorData>()
 
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -33,11 +38,11 @@ class FirebaseSensorRepositoryImpl : SensorRepository {
                 val currentReading = SensorData(time, temp, hum, press, gas)
 
                 // Добавляем новое измерение к уже существующим точкам графика
-                historyList.add(currentReading)
-
-                // Чтобы график не перегружался, храним только последние 20 точек
-                if (historyList.size > 20) {
-                    historyList.removeAt(0)
+                if (historyList.lastOrNull()?.timestamp != time) {
+                    historyList.add(currentReading)
+                    if (historyList.size > MAX_HISTORY) {
+                        historyList.removeAt(0)
+                    }
                 }
 
                 // Отправляем всю накопленную историю в Jetpack Compose
@@ -51,7 +56,7 @@ class FirebaseSensorRepositoryImpl : SensorRepository {
 
         databaseRef.addValueEventListener(listener)
 
-        // Очищаем слушатель при уничтожении экрана
+        // очистить слушатель при уничтожении экрана
         awaitClose { databaseRef.removeEventListener(listener) }
     }
 }
