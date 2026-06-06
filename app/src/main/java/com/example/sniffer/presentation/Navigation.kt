@@ -25,7 +25,13 @@ fun Navigation() {
                 }
             )
         ){entry ->
-            MainScreen(name = entry.arguments?.getString("name"))
+            MainScreen(
+                name = entry.arguments?.getString("name"),
+                onLogout = {
+                    navController.navigate(Screen.LoginScreen.route){
+                        popUpTo(0) { inclusive = true }
+                    }
+                })
         }
     }
 }

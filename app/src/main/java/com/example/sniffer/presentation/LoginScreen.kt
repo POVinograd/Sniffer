@@ -29,16 +29,26 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.sniffer.presentation.Screen
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewModel()) {
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(Unit) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            val userName = currentUser.email ?: "Пользователь"
+            navController.navigate(Screen.MainScreen.withArgs(userName)) {
+                popUpTo(Screen.LoginScreen.route) { inclusive = true }
+            }
+            return@LaunchedEffect
+        }
         viewModel.loginResult.collectLatest { result ->
             if (result.isSuccess) {
-                navController.navigate(Screen.MainScreen.withArgs(viewModel.email))
+                val targetName = viewModel.email.ifBlank { "Пользователь" }
+                navController.navigate(Screen.MainScreen.withArgs(targetName))
             } else {
                 Toast.makeText(context, "Ошибка: ${result.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
             }

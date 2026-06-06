@@ -1,11 +1,13 @@
 package com.example.sniffer.presentation
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,8 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,16 +39,32 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sniffer.domain.SensorData
 
 @Composable
-fun MainScreen(name: String?, viewModel: MainViewModel = viewModel()) {
+fun MainScreen(
+    name: String?,
+    onLogout: () -> Unit,
+    viewModel: MainViewModel = viewModel()) {
     val timelineData by viewModel.sensorData.collectAsState()
     // Безопасно берем последний элемент. Если его нет, используем дефолтные нули
     val currentReading = timelineData.lastOrNull() ?: SensorData(0L, 0f, 0f, 0f, 0f)
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Spacer(modifier = Modifier.height(32.dp))
-        Text(text = "Hello, $name", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            //Приветствие
+            //Spacer(modifier = Modifier.height(32.dp))
+            Text(text = "Hello, $name", style = MaterialTheme.typography.headlineMedium)
+            //Spacer(modifier = Modifier.height(16.dp))
+            IconButton(onClick = {
+                Log.d("LOGOUT", "")
+                viewModel.logout()
+                onLogout()
 
+            }) {
+                Icon(Icons.Filled.Close, contentDescription = "Log out")
+            }
+        }
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
