@@ -30,12 +30,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sniffer.domain.AirQualityAdvisor
 import com.example.sniffer.domain.SensorData
 
 @Composable
@@ -44,18 +44,23 @@ fun MainScreen(
     onLogout: () -> Unit,
     viewModel: MainViewModel = viewModel()) {
     val timelineData by viewModel.sensorData.collectAsState()
-    // Безопасно берем последний элемент. Если его нет, используем дефолтные нули
+
     val currentReading = timelineData.lastOrNull() ?: SensorData(0L, 0f, 0f, 0f, 0f)
+    val alerts = viewModel.activeAlerts
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Row(modifier = Modifier.fillMaxWidth(),
+        //Top bar
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically)
+            verticalAlignment = Alignment.CenterVertically
+        )
         {
             //Приветствие
             //Spacer(modifier = Modifier.height(32.dp))
             Text(text = "Hello, $name", style = MaterialTheme.typography.headlineMedium)
             //Spacer(modifier = Modifier.height(16.dp))
+            //Кнопка выхода из аккаунта
             IconButton(onClick = {
                 Log.d("LOGOUT", "")
                 viewModel.logout()
@@ -65,6 +70,7 @@ fun MainScreen(
                 Icon(Icons.Filled.Close, contentDescription = "Log out")
             }
         }
+        //Сетка сенсорных карточек
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -108,9 +114,12 @@ fun MainScreen(
                 }
             }
         }
-
+        //График
         Spacer(modifier = Modifier.height(24.dp))
-        Text(text = "Live Curve: ${viewModel.selectedMetric.name}", style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = "Live Curve: ${viewModel.selectedMetric.name}",
+            style = MaterialTheme.typography.titleMedium
+        )
         Spacer(modifier = Modifier.height(8.dp))
 
         // Отрисовываем график, только если у нас есть хотя бы 1 точка данных
@@ -123,11 +132,37 @@ fun MainScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .background(Color.DarkGray.copy(alpha = 0.05f), shape = RoundedCornerShape(8.dp))
+                    .background(
+                        Color.DarkGray.copy(alpha = 0.05f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
             ) {
                 Text(text = "Ожидание данных из Firebase...", color = Color.Gray)
             }
         }
+
+        //Alert-карточка
+        Text(text = "Air Quality Status", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (alerts.isEmpty()) {
+            AlertCard(
+                title = "All good!",
+                message = "Ноу проблемо. Качество воздуха в порядке.",
+                severity = AirQualityAdvisor.Severity.INFO
+            )
+        } else {
+            alerts.forEach { alert ->
+                AlertCard(
+                    title = alert.title,
+                    message = alert.message,
+                    severity = alert.severity
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -199,5 +234,39 @@ fun Bme680Graph(dataPoints: List<SensorData>, selectedType: MetricType) {
             drawCircle(color = Color(0xFF6200EE), radius = 4f, center = Offset(x, y))
         }
         drawPath(path = path, color = Color(0xFF3700B3), style = Stroke(width = 4f))
+    }
+}
+
+@Composable
+fun AlertCard(
+    title: String,
+    message: String,
+    severity: AirQualityAdvisor.Severity
+) {
+    val (bgColor, borderColor) = when (severity) {
+        AirQualityAdvisor.Severity.DANGER  ->
+            MaterialTheme.colorScheme.errorContainer  to MaterialTheme.colorScheme.error
+        AirQualityAdvisor.Severity.WARNING ->
+            MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f) to
+                    MaterialTheme.colorScheme.tertiary
+        AirQualityAdvisor.Severity.INFO    ->
+            MaterialTheme.colorScheme.surfaceVariant  to MaterialTheme.colorScheme.primary
+    }
+    Card(
+        shape  = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = bgColor),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = title, style = MaterialTheme.typography.titleSmall)
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text  = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
+            )
+        }
     }
 }

@@ -32,7 +32,7 @@ class FirebaseSensorRepositoryImpl : SensorRepository {
                 val temp = snapshot.child("temperature").getValue(Float::class.java) ?: 0f
                 val hum = snapshot.child("humidity").getValue(Float::class.java) ?: 0f
                 val press = snapshot.child("pressure").getValue(Float::class.java) ?: 0f
-                val gas = snapshot.child("gas_resistance").getValue(Float::class.java) ?: 0f
+                val gas = snapshot.child("iaq").getValue(Float::class.java) ?: 0f
                 val time = snapshot.child("timestamp").getValue(Long::class.java) ?: 0L
 
                 val currentReading = SensorData(time, temp, hum, press, gas)
