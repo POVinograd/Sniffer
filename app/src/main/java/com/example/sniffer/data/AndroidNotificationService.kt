@@ -11,7 +11,7 @@ import com.example.sniffer.domain.NotificationService
 
 object AndroidNotificationService : NotificationService {
 
-    private const val CHANNEL_ID   = "sniffer_smoke_alert"
+    const val CHANNEL_ID   = "sniffer_smoke_alert"
     private const val CHANNEL_NAME = "Smoke & Danger Alerts"
     private const val NOTIF_ID     = 1001
 
