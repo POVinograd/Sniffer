@@ -29,7 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.sniffer.presentation.Screen
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -50,7 +56,8 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
                 val targetName = viewModel.email.ifBlank { "Пользователь" }
                 navController.navigate(Screen.MainScreen.withArgs(targetName))
             } else {
-                Toast.makeText(context, "Ошибка: ${result.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                val errorMessage = getLocalizedErrorMessage(result.exceptionOrNull())
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -97,5 +104,50 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
                 }
             }
         }
+    }
+}
+
+fun getLocalizedErrorMessage(exception: Throwable?): String {
+    return when (exception) {
+        // 1. Ошибка отсутствия интернета на самом смартфоне
+        is FirebaseNetworkException -> {
+            "Отсутствует подключение к интернету. Проверьте сеть."
+        }
+
+        // 2. Ошибка: Неверный пароль или malformed email (Firebase бросает этот класс)
+        is FirebaseAuthInvalidCredentialsException -> {
+            "Неверный пароль или формат почты. Попробуйте еще раз."
+        }
+
+        // 3. Ошибка: Пользователь не найден в базе данных или заблокирован
+        is FirebaseAuthInvalidUserException -> {
+            "Пользователь с такой почтой не найден или заблокирован."
+        }
+
+        // 4. Ошибка при РЕГИСТРАЦИИ: Пользователь с таким email уже существует
+        is FirebaseAuthUserCollisionException -> {
+            "Эта почта уже зарегистрирована другим пользователем."
+        }
+
+        // 5. Ошибка при РЕГИСТРАЦИИ: Слишком простой или короткий пароль
+        is FirebaseAuthWeakPasswordException -> {
+            "Пароль слишком слабый. Он должен быть не менее 6 символов."
+        }
+
+        // 6. Запасной вариант для остальных ошибок Firebase (если errorCode все-таки прилетит)
+        is FirebaseAuthException -> {
+            when (exception.errorCode) {
+                "ERROR_INVALID_EMAIL" -> "Неверный формат почты."
+                "ERROR_WRONG_PASSWORD" -> "Неверный пароль. Попробуйте еще раз."
+                "ERROR_USER_NOT_FOUND" -> "Пользователь с такой почтой не найден."
+                "ERROR_EMAIL_ALREADY_IN_USE" -> "Эта почта уже зарегистрирована."
+                "ERROR_WEAK_PASSWORD" -> "Пароль должен быть не менее 6 символов."
+                "ERROR_NETWORK_REQUEST_FAILED" -> "Сбой сети при связи с сервером."
+                else -> "Ошибка авторизации: ${exception.localizedMessage}"
+            }
+        }
+
+        // 7. Любая другая непредвиденная системная ошибка
+        else -> exception?.localizedMessage ?: "Произошла неизвестная ошибка."
     }
 }

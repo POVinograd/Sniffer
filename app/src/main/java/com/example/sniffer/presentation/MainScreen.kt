@@ -48,7 +48,7 @@ fun MainScreen(
     val currentReading = timelineData.lastOrNull() ?: SensorData(0L, 0f, 0f, 0f, 0f)
     val alerts = viewModel.activeAlerts
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
         //Top bar
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -58,7 +58,7 @@ fun MainScreen(
         {
             //Приветствие
             //Spacer(modifier = Modifier.height(32.dp))
-            Text(text = "Hello, $name", style = MaterialTheme.typography.headlineMedium)
+            Text(text = "Привет, ${name?.substringBefore("@")}!", style = MaterialTheme.typography.headlineMedium)
             //Spacer(modifier = Modifier.height(16.dp))
             //Кнопка выхода из аккаунта
             IconButton(onClick = {
@@ -117,10 +117,10 @@ fun MainScreen(
         //График
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "Live Curve: ${viewModel.selectedMetric.name}",
+            text = "График: ${viewModel.selectedMetric.title}",
             style = MaterialTheme.typography.titleMedium
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        //Spacer(modifier = Modifier.height(8.dp))
 
         // Отрисовываем график, только если у нас есть хотя бы 1 точка данных
         if (timelineData.isNotEmpty()) {
@@ -142,12 +142,12 @@ fun MainScreen(
         }
 
         //Alert-карточка
-        Text(text = "Air Quality Status", style = MaterialTheme.typography.titleMedium)
-        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Статус качества воздуха", style = MaterialTheme.typography.titleMedium)
+        //Spacer(modifier = Modifier.height(8.dp))
 
         if (alerts.isEmpty()) {
             AlertCard(
-                title = "All good!",
+                title = "Всё хорошо!",
                 message = "Ноу проблемо. Качество воздуха в порядке.",
                 severity = AirQualityAdvisor.Severity.INFO
             )

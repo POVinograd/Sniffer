@@ -21,6 +21,14 @@ class LoginViewModel : ViewModel() {
 
     fun onLoginClick() {
         viewModelScope.launch {
+            if (email.isEmpty() || password.isEmpty()) {
+                _loginResult.emit(Result.failure(Exception("Поля не должны быть пустыми")))
+                return@launch
+            }
+            if (password.length < 6) {
+                _loginResult.emit(Result.failure(Exception("Пароль должен быть от 6 символов")))
+                return@launch
+            }
             isLoading = true
             val result = repository.login(email, password)
             _loginResult.emit(result)

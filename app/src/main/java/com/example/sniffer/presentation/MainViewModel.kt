@@ -21,7 +21,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
-enum class MetricType { TEMPERATURE, HUMIDITY, PRESSURE, GAS }
+enum class MetricType(val title: String) {
+    TEMPERATURE("ТЕМПЕРАТУРА"),
+    HUMIDITY("ВЛАЖНОСТЬ"),
+    PRESSURE("ДАВЛЕНИЕ"),
+    GAS("ИНДЕКС КАЧЕСТВА ВОЗДУХА")}
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val sensorRepository: SensorRepository = FirebaseSensorRepositoryImpl()
