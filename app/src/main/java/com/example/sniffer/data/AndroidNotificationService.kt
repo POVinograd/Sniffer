@@ -44,13 +44,13 @@ object AndroidNotificationService : NotificationService {
         val ctx = appContext ?: return
         val notification = NotificationCompat.Builder(ctx, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Smoke / Vapour Detected!")
-            .setContentText("IAQ: $iaq  •  Temp: $temperature°C — Check for burnt food, smoke, or fumes.")
+            .setContentTitle("Дым / Газ!")
+            .setContentText("IAQ: $iaq  •  Темп: $temperature°C — Проверьте плиту.")
             .setStyle(
                 NotificationCompat.BigTextStyle().bigText(
-                    "A sudden spike in air quality index (IAQ $iaq) combined with " +
-                            "elevated temperature (${temperature}°C) was detected by your Sniffer sensor.\n\n" +
-                            "Please check for burnt food, smoke, or chemical vapours immediately."
+                    "Высокий показатель качества воздуха $iaq вместе с " +
+                            "температурой (${temperature}°C)." +
+                            "Проверьте помещение на наличие дыма / сгоревшей еды / утечки газа немедленно!"
                 )
             )
             .setPriority(NotificationCompat.PRIORITY_HIGH)
