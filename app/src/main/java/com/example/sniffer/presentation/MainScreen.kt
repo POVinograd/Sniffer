@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -145,24 +147,30 @@ fun MainScreen(
         Text(text = "Статус качества воздуха", style = MaterialTheme.typography.titleMedium)
         //Spacer(modifier = Modifier.height(8.dp))
 
-        if (alerts.isEmpty()) {
-            AlertCard(
-                title = "Всё хорошо!",
-                message = "Ноу проблемо. Качество воздуха в порядке.",
-                severity = AirQualityAdvisor.Severity.INFO
-            )
-        } else {
-            alerts.forEach { alert ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f), // Заставляет список ужиматься и прокручиваться внутри себя
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (alerts.isEmpty()) {
+                item{
                 AlertCard(
-                    title = alert.title,
-                    message = alert.message,
-                    severity = alert.severity
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                    title = "Всё хорошо!",
+                    message = "Ноу проблемо. Качество воздуха в порядке.",
+                    severity = AirQualityAdvisor.Severity.INFO
+                )}
+            } else {
+                items(alerts) { alert ->
+                    AlertCard(
+                        title = alert.title,
+                        message = alert.message,
+                        severity = alert.severity
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
